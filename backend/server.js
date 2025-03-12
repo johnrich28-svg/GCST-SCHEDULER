@@ -1,24 +1,60 @@
-require("dotenv").config(); // Load environment configurations from .env file
-const express = require("express"); // Import express to create the server application
-const cors = require("cors"); // Import cors to enable Cross-Origin Resource Sharing
-const connectDB = require("./config/db"); // Import the connectDB function to establish MongoDB connection
+const express = require("express");
+const connectDB = require("./config/db");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const { exec } = require("child_process");
+
+dotenv.config(); // Load environment variables
+connectDB(); // Connect to MongoDB
 
 const app = express();
-const port = process.env.PORT || 3000; // Define the port for the server, using environment variable or default to 3000
 
-// Function to start the server
-async function startServer() {
+// Middleware
+app.use(express.json()); // Parse JSON body
+app.use(cors()); // Enable CORS
+app.use(helmet()); // Security headers
+app.use(morgan("dev")); // Request logging
+
+// Routes
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
+
+const PORT = process.env.PORT || 5000;
+
+// Start server
+const startServer = async () => {
   try {
-    await connectDB(); // Attempt to connect to MongoDB, handled with error handling in db.js
-    app.use(cors()); // Enable CORS middleware to allow cross-origin requests
-    app.use(express.json()); // Enable JSON parsing middleware to parse incoming JSON request bodies
+    const server = app.listen(PORT, () =>
+      console.log(`🚀 Server running on port ${PORT}`)
+    );
 
-    app.listen(port, () => {
-      console.log(`👂 Server listening at http://localhost:${port} 👂`); // Log successful server start
+    // Handle server errors
+    server.on("error", async (err) => {
+      if (err.code === "EADDRINUSE") {
+        console.error(
+          `⚠️ Port ${PORT} is already in use. Attempting to free up the port...`
+        );
+        exec(`npx kill-port ${PORT}`, async (execErr) => {
+          if (execErr) {
+            console.error(
+              `❌ Failed to free up port ${PORT}: ${execErr.message}`
+            );
+            process.exit(1);
+          } else {
+            console.log(`✅ Port ${PORT} freed up. Restarting server...`);
+            await startServer();
+          }
+        });
+      } else {
+        console.error(`❌ Server error: ${err.message}`);
+      }
     });
   } catch (error) {
-    console.error(`🔥 Server startup error: ${error} 🔥`); // Log server startup errors
+    console.error(`❌ Failed to start server: ${error.message}`);
   }
-}
+};
 
-startServer(); // Start the server application
+// Start the server
+startServer();

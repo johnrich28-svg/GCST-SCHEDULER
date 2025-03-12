@@ -6,16 +6,13 @@ const mongoose = require("mongoose");
  */
 const AdminSchema = new mongoose.Schema({
   admin_id: { type: Number, unique: true, required: true }, // Unique admin ID
-  username: { type: String, required: true }, // Admin username
+  username: { type: String, required: true, unique: true }, // Admin username
   password: { type: String, required: true }, // Hashed password
   name: { type: String, required: true }, // Admin full name
-  email: { type: String, required: true }, // Admin email
-  status: { type: String, required: true }, // Account status (active/inactive)
-  role: {
-    type: String,
-    enum: ["super_admin", "admin"],
-    required: true,
-  }, // Role to distinguish Super Admin and Admin
+  email: { type: String, required: true, unique: true }, // Admin email
+  status: { type: String, enum: ["active", "inactive"], required: true }, // Account status
+  role: { type: String, enum: ["super_admin", "admin"], required: true }, // Role type
 });
 
-module.export = mongoose.model("Admin", AdminSchema);
+// Fix the export statement
+module.exports = mongoose.model("Admin", AdminSchema);

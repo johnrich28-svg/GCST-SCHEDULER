@@ -5,6 +5,8 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const { exec } = require("child_process");
+const adminRoutes = require("./routes/adminRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 dotenv.config(); // Load environment variables
 connectDB(); // Connect to MongoDB
@@ -18,12 +20,12 @@ app.use(helmet()); // Security headers
 app.use(morgan("dev")); // Request logging
 
 // Routes
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-// Start server
+// Function to start the server
 const startServer = async () => {
   try {
     const server = app.listen(PORT, () =>

@@ -1,5 +1,11 @@
 const express = require("express");
 const { authMiddleware } = require("../middleware/authMiddleware");
+const {
+  createAdmin,
+  getAdmins,
+  updateAdmin,
+  deleteAdmin,
+} = require("../controllers/adminController");
 
 const router = express.Router();
 
@@ -10,5 +16,11 @@ router.get("/dashboard", authMiddleware, (req, res) => {
     admin: req.admin,
   });
 });
+
+// Super Admin CRUD
+router.post("/create-admins", createAdmin);
+router.get("/retrieve-admins", getAdmins);
+router.put("/update-admins/:id", updateAdmin);
+router.delete("/delete-admins/:id", deleteAdmin);
 
 module.exports = router;

@@ -20,7 +20,7 @@ router.get("/dashboard", authMiddleware, (req, res) => {
 // Super Admin CRUD
 router.post("/create-admins", createAdmin);
 router.get("/retrieve-admins", getAdmins);
-router.put("/update-admins/:id", updateAdmin);
-router.delete("/delete-admins/:id", deleteAdmin);
+router.put("/update-admins/:_id", updateAdmin);
+router.delete("/delete-admins/:_id", deleteAdmin);
 
 module.exports = router;

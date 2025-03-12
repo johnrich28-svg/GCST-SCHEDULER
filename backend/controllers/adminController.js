@@ -3,25 +3,23 @@ const bcrypt = require("bcryptjs");
 const Admin = require("../models/Admin");
 const Sequence = require("../models/Sequence");
 
-// Function to get the next sequence value
-const getNextSequenceValue = async (sequenceName) => {
-  const sequence = await Sequence.findOneAndUpdate(
-    { name: sequenceName },
-    { $inc: { value: 1 } },
-    { new: true, upsert: true }
-  );
-  return sequence.value;
-};
+// // Function to get the next sequence value
+// const getNextSequenceValue = async (sequenceName) => {
+//   const sequence = await Sequence.findOneAndUpdate(
+//     { name: sequenceName },
+//     { $inc: { value: 1 } },
+//     { new: true, upsert: true }
+//   );
+//   return sequence.value;
+// };
 
 // Create a new admin
 exports.createAdmin = async (req, res) => {
   try {
     const { username, password, name, email, status, role } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const adminId = await getNextSequenceValue("admin_id");
 
     const newAdmin = await Admin.create({
-      admin_id: adminId,
       username,
       password: hashedPassword,
       name,
@@ -61,20 +59,38 @@ exports.getAdmins = async (req, res) => {
 
 // Update an admin
 exports.updateAdmin = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updatedData = req.body;
+  const adminId = req.params._id; // Use _id instead of admin_id
+  console.log(`Updating admin with ID: ${adminId}`);
 
+  try {
+    const admin = await Admin.findById(adminId); // Find by MongoDB _id
+    if (!admin) {
+      console.log(`Admin with ID: ${adminId} not found`);
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    let updatedData = req.body;
+
+    // Check if password is being updated
     if (updatedData.password) {
       updatedData.password = await bcrypt.hash(updatedData.password, 10);
     }
 
-    const updatedAdmin = await Admin.findByIdAndUpdate(id, updatedData, {
-      new: true,
-    });
+    // Find and update by MongoDB _id
+    const updatedAdmin = await Admin.findByIdAndUpdate(
+      adminId, // Match by MongoDB _id
+      updatedData,
+      { new: true } // Return the updated document
+    );
 
+    if (!updatedAdmin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    console.log(`Admin with ID: ${adminId} updated successfully`);
     res.json({ message: "Admin updated successfully", updatedAdmin });
   } catch (err) {
+    console.error(`Error updating admin with ID: ${adminId}`, err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -82,7 +98,15 @@ exports.updateAdmin = async (req, res) => {
 // Delete an admin
 exports.deleteAdmin = async (req, res) => {
   try {
-    await Admin.findByIdAndDelete(req.params.id);
+    const { _id } = req.params; // Use _id instead of admin_id
+
+    // Find and delete by MongoDB _id
+    const deletedAdmin = await Admin.findByIdAndDelete(_id);
+
+    if (!deletedAdmin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
     res.json({ message: "Admin deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });

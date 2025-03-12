@@ -5,9 +5,16 @@ const mongoose = require("mongoose");
  * Represents students' enrollment in sections.
  */
 const ScheduleSchema = new mongoose.Schema({
-  schedule_id: { type: Number, unique: true, required: true }, // Schedule ID PRIMARY KEY
-  student_id: { type: Number, ref: "Student", required: true }, // Student ID FOREIGN KEY
-  section_id: { type: Number, ref: "Section", required: true }, // Section ID FOREIGN KEY
+  student_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Student",
+    required: true,
+  }, // Student ID FOREIGN KEY
+  section_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Section",
+    required: true,
+  }, // Section ID FOREIGN KEY
 });
 
-module.exports = mongoose.model("ScheduleSchema", ScheduleSchema);
+module.exports = mongoose.model("Schedule", ScheduleSchema);

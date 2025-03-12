@@ -19,7 +19,6 @@ const connectDB = async () => {
       const hashedPassword = await bcrypt.hash("superadmin123", 10);
 
       await Admin.create({
-        admin_id: 1,
         username: "superadmin",
         password: hashedPassword,
         name: "Super Admin",

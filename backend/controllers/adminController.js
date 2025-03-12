@@ -1,17 +1,6 @@
 // controllers/adminController.js
 const bcrypt = require("bcryptjs");
 const Admin = require("../models/Admin");
-const Sequence = require("../models/Sequence");
-
-// // Function to get the next sequence value
-// const getNextSequenceValue = async (sequenceName) => {
-//   const sequence = await Sequence.findOneAndUpdate(
-//     { name: sequenceName },
-//     { $inc: { value: 1 } },
-//     { new: true, upsert: true }
-//   );
-//   return sequence.value;
-// };
 
 // Create a new admin
 exports.createAdmin = async (req, res) => {
@@ -29,6 +18,30 @@ exports.createAdmin = async (req, res) => {
     });
 
     res.status(201).json({ message: "Admin created successfully", newAdmin });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Activate or deactivate an admin
+exports.toggleAdminStatus = async (req, res) => {
+  try {
+    const { _id } = req.params;
+    const admin = await Admin.findById(_id);
+
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    admin.status = admin.status === "active" ? "inactive" : "active";
+    await admin.save();
+
+    res.json({
+      message: `Admin ${
+        admin.status === "active" ? "activated" : "deactivated"
+      } successfully`,
+      admin,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

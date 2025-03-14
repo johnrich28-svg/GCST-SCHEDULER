@@ -13,17 +13,20 @@ const connectDB = async () => {
     console.log("🚀 MongoDB Connected! 🚀");
 
     // Check if a Super Admin already exists
-    const existingSuperAdmin = await Admin.findOne({ role: "super_admin" });
+    const existingAdmin = await Admin.findOne({ role: "admin" });
 
-    if (!existingSuperAdmin) {
-      const hashedPassword = await bcrypt.hash("superadmin123", 10);
+    if (!existingAdmin) {
+      const hashedPassword = await bcrypt.hash("admin123", 10);
 
       await Admin.create({
         password: hashedPassword,
-        name: "Super Admin",
-        email: "superadmin@example.com",
+        name: "Admin",
+        birthdate: "2004-10-28",
+        email: "admin@example.com",
+        contact_number: "09674659165",
+        address: "Manila, Philippines",
         status: "active",
-        role: "super_admin",
+        role: "admin",
       });
 
       console.log(

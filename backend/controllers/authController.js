@@ -7,10 +7,10 @@ const jwt = require("jsonwebtoken");
  */
 exports.loginAdmin = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     // Check if the admin exists
-    const admin = await Admin.findOne({ username });
+    const admin = await Admin.findOne({ email });
     if (!admin) {
       return res.status(401).json({ message: "Invalid username or password" });
     }
@@ -28,7 +28,12 @@ exports.loginAdmin = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.json({ token, message: "Login successful" });
+    // Redirect to dashboard with token
+    res.json({
+      token,
+      message: "Login successful",
+      redirect: `/api/auth/dashboard?token=${token}`,
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }

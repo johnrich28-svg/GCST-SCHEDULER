@@ -24,6 +24,10 @@ const StudentSchema = new mongoose.Schema(
     }, // Regular/Irregular
     email: { type: String, required: true, unique: true, match: /.+\@.+\..+/ }, // Email with validation
     password: { type: String, required: true }, // Hashed password
+    contact_number: { type: String, required: true }, // Contact number
+    address: { type: String, required: true }, // Home address
+    guardian_name: { type: String, required: true }, // Guardian's name
+    guardian_contact: { type: String, required: true }, // Guardian's contact number
   },
   { timestamps: true }
 ); // Add timestamps

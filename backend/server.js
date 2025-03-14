@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const cookieParser = require("cookie-parser"); // Import cookie-parser
 const { exec } = require("child_process");
 const adminRoutes = require("./routes/adminRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -18,6 +19,7 @@ app.use(express.json()); // Parse JSON body
 app.use(cors()); // Enable CORS
 app.use(helmet()); // Security headers
 app.use(morgan("dev")); // Request logging
+app.use(cookieParser()); // Parse cookies
 
 // Routes
 app.use("/api/auth", authRoutes);

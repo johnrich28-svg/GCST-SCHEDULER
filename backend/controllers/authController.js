@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
  */
 exports.loginAdmin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body; // Extract email and password from request body
 
     // Check if the admin exists
     const admin = await Admin.findOne({ email });

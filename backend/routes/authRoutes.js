@@ -8,12 +8,12 @@ router.post("/login", loginAdmin);
 
 // Route to handle redirection after login
 router.get("/dashboard", (req, res) => {
-  const token = req.query.token;
+  const token = req.query.token; // Get token from query parameters
   if (token) {
-    res.cookie("token", token, { httpOnly: true });
-    res.redirect("/api/admin/dashboard");
+    res.cookie("token", token, { httpOnly: true }); // Set token as an HTTP-only cookie
+    res.redirect("/api/admin/dashboard"); // Redirect to admin dashboard
   } else {
-    res.status(401).json({ message: "Unauthorized" });
+    res.redirect("/login"); // Redirect to login page if no token
   }
 });
 
